@@ -1,55 +1,43 @@
-import sys
-
-N = int(sys.stdin.readline())
-
-board = [list(map(str, input())) for _ in range(N)]
-
-res = 0
-
-
-def check(board):
-    cnt = 0
-    for i in range(N):
-        cnt_row = 1
-        cnt_col = 1
-        for j in range(N-1):
-            if board[i][j] == board[i][j+1]:
-                cnt_row += 1
-            else:
-                cnt = max(cnt, cnt_row)
-                cnt_row = 1
-
-            if board[j][i] == board[j+1][i]:
-                cnt_col += 1
-            else:
-                cnt = max(cnt, cnt_col)
-                cnt_col = 1
-        cnt = max(cnt, cnt_row, cnt_col)
-    return cnt
+def countcol(i):  # i 번째 열 검사하기
+    res = 1
+    cnt = 1
+    for k in range(n-1):
+        if candy[k+1][i] == candy[k][i]:
+            cnt += 1
+            res = max(res, cnt)
+        else:
+            cnt = 1
+    return res
 
 
-for i in range(N):
-    for j in range(N-1):
-        if board[i][j] != board[i][j+1]:
-            tmp = board[i][j]
-            board[i][j] = board[i][j+1]
-            board[i][j+1] = tmp
+def countraw(j):  # j 번째 행 검사하기
+    res = 1
+    cnt = 1
+    for k in range(n-1):
+        if candy[j][k+1] == candy[j][k]:
+            cnt += 1
+            res = max(res, cnt)
+        else:
+            cnt = 1
+    return res
 
-            res = max(res, check(board))
 
-            tmp = board[i][j]
-            board[i][j] = board[i][j+1]
-            board[i][j+1] = tmp
+n = int(input())
+candy = [list(input()) for _ in range(n)]
 
-        if board[j][i] != board[j+1][i]:
-            tmp = board[j][i]
-            board[j][i] = board[j+1][i]
-            board[j+1][i] = tmp
+maxcandy = 0
 
-            res = max(res, check(board))
+for i in range(n):
+    maxcandy = max(maxcandy, countcol(i), countraw(i))
 
-            tmp = board[j][i]
-            board[j][i] = board[j+1][i]
-            board[j+1][i] = tmp
+for i in range(n):
+    for j in range(n-1):
+        candy[i][j+1], candy[i][j] = candy[i][j], candy[i][j+1]
+        maxcandy = max(maxcandy, countraw(i), countcol(j), countcol(j+1))
+        candy[i][j+1], candy[i][j] = candy[i][j], candy[i][j+1]
 
-print(res)
+        candy[j+1][i], candy[j][i] = candy[j][i], candy[j+1][i]
+        maxcandy = max(maxcandy, countraw(j), countraw(j+1), countcol(i))
+        candy[j+1][i], candy[j][i] = candy[j][i], candy[j+1][i]
+
+print(maxcandy)

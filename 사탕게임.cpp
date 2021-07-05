@@ -1,73 +1,90 @@
-#include <iostream>
-#include <algorithm>
-#include <string>
-
-using namespace std;
-
-const int MAX =51;
+// 3085번 사탕 게임
+#include <cstdio>
+#define max(a, b) a > b ? a : b
+#define swap(a, b) \
+  {                \
+    char tmp = a;  \
+    a = b;         \
+    b = tmp;       \
+  }
 int n;
-char board[MAX][MAX];
-int ans; 
-
-void findMax(){
-//가로(열) 부터 시작 
-  for(int i=1; i<=n; i++){
-    int cnt =1;
-    for(int j=1; j<=n-1 ;j++){
-      if(board[i][j] == board[i][j+1]) cnt++;
-      else cnt = 1; 
-      ans = max(ans,cnt);
+char ch[51][51];
+int rowCheck(int row)
+{
+  if (row >= n + 1)
+    return 0;
+  int ret = 0;
+  int cnt = 1;
+  for (int i = 1; i < n; i++)
+  {
+    if (ch[row][i] == ch[row][i + 1])
+    {
+      cnt += 1;
+      ret = max(cnt, ret);
+    }
+    else
+    {
+      ret = max(cnt, ret);
+      cnt = 1;
     }
   }
-  //세로(행) 부터 시작
+  return ret;
+}
+int colCheck(int column)
+{
+  if (column >= n + 1)
+    return 0;
+  int ret = 0;
+  int cnt = 1;
+  for (int i = 1; i < n; i++)
+  {
+    if (ch[i][column] == ch[i + 1][column])
+    {
+      cnt += 1;
+      ret = max(cnt, ret);
+    }
+    else
+    {
+      ret = max(cnt, ret);
+      cnt = 1;
+    }
+  }
+  return ret;
+}
+int main()
+{
+  scanf("%d", &n);
   for (int i = 1; i <= n; i++)
   {
-    int cnt = 1;
-    for (int j = 1; j <= n - 1; j++)
+    for (int j = 1; j <= n; j++)
     {
-      if (board[j][i] == board[j+1][i])
-        cnt++;
-      else
-        cnt = 1;
-      ans = max(ans, cnt);
+      scanf(" %c", &ch[i][j]);
     }
+    getchar();
   }
-}
-
-void solve(){
-  // 열(col) swap 후 count 해보기
-  for(int i=1; i<=n; i++){
-    for(int j=1; j<=n-1; j++){
-      swap(board[i][j], board[i][j+1]);
-      findMax();
-      swap(board[i][j], board[i][j + 1]);
-    }
-  }
-  // 행(row) swap후 count 해보기
+  int ans = 0;
   for (int i = 1; i <= n; i++)
   {
-    for (int j = 1; j <= n - 1; j++)
+    for (int j = 1; j <= n; j++)
     {
-      swap(board[j][i], board[j+1][i]);
-      findMax();
-      swap(board[j][i], board[j+1][i]);
+      if (i < n)
+      {
+        swap(ch[i][j], ch[i + 1][j]);
+        ans = max(colCheck(j), ans);
+        ans = max(rowCheck(i), ans);
+        ans = max(rowCheck(i + 1), ans);
+        swap(ch[i][j], ch[i + 1][j]);
+      }
+      if (j < n)
+      {
+        swap(ch[i][j], ch[i][j + 1]);
+        ans = max(rowCheck(i), ans);
+        ans = max(colCheck(j), ans);
+        ans = max(colCheck(j + 1), ans);
+        swap(ch[i][j], ch[i][j + 1]);
+      }
     }
   }
-}
-
-int main(){
-  ios::sync_with_stdio(false);
-  cin.tie(0); 
-
-  cin>>n;
-  for(int i=1; i<=n; i++){
-    string s;
-    cin>>s;
-    for(int j=1; j<=n; j++){
-      board[i][j] = s[j-1];
-    }
-  }
-  solve();
-  cout<<ans; 
+  printf("%d\n", ans);
   return 0;
 }
